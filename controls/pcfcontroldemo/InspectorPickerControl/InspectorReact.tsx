@@ -1,3 +1,5 @@
+import { release } from "os";
+import { relative } from "path";
 import * as React from "react";
 import AsyncSelect from 'react-select/async';
 
@@ -46,27 +48,19 @@ export class MultiSelectControl extends React.Component<IProps, IState> {
 	}	
 	
 	public render(): JSX.Element 
-	{
-		
-		const styles = {
-			menu: (base: any) => ({
-			  ...base,
-			  flex: 1,	
-			  flexDirection: 'row',
-			  position: 'static'
-			})
-		  };
-		
+	{		
+		 const selectStyles = { menuPortal: (zzz: any) => ({ ...zzz, zIndex: 9999}) };
+
         return (
 			<div>
 			<AsyncSelect
 			isMulti={true}
-			styles={styles}
+			menuPortalTarget={document.body}
+			styles={selectStyles}
 			getOptionLabel={e => e.name}
 			getOptionValue={e => e.bookableresourceid}
 			loadOptions={this.loadOptions}
 			defaultOptions
-			minMenuHeight={300}
 			onChange={this.onChange}		
 			/></div>
         );
