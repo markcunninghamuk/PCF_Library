@@ -1,9 +1,9 @@
 import {IInputs, IOutputs} from "./generated/ManifestTypes";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { IProps, MultiSelectControl } from "./InspectorReact";
+import { IProps, MultiSelectControl } from "./MultiSelect";
 
-export class InspectorPickerControl implements ComponentFramework.StandardControl<IInputs, IOutputs> {
+export class MultiSelectPCFControl implements ComponentFramework.StandardControl<IInputs, IOutputs> {
 
 	private _value: any;
 	private _notifyOutputChanged:() => void;
@@ -13,7 +13,13 @@ export class InspectorPickerControl implements ComponentFramework.StandardContro
 		value : "", 
 		onChange : this.notifyChange.bind(this),
 		onSearch : this.notifySearch.bind(this),
-		records: []	
+		records: [],
+		displayValueField: "",
+		displayFieldLabel: "",
+		columns: "",
+		topCount: "",
+		filterField: "",
+		entityName: ""	
 	};
 	private _context: ComponentFramework.Context<IInputs>;
 
@@ -40,7 +46,13 @@ export class InspectorPickerControl implements ComponentFramework.StandardContro
 		this._notifyOutputChanged = notifyOutputChanged;
 		this._container = document.createElement("div");
 		this.props.value = context.parameters.sampleProperty.raw || "";	
-		
+		this.props.entityName = context.parameters.entityName.raw || "";
+		this.props.filterField = context.parameters.filterField.raw || "";
+		this.props.topCount = context.parameters.topCount.raw || "";
+		this.props.columns = context.parameters.columns.raw || "";
+		this.props.displayFieldLabel = context.parameters.displayFieldLabel.raw || "";
+		this.props.displayValueField = context.parameters.displayValueField.raw || "";
+				
 		container.appendChild(this._container);
 		console.log("init");
 	}
@@ -55,13 +67,13 @@ export class InspectorPickerControl implements ComponentFramework.StandardContro
 	async notifySearch(newValue: string)
 	{
 		console.log("called notifySearch");
-	
-		return this._context.webAPI.retrieveMultipleRecords("bookableresource","?$select=name,bookableresourceid&$filter=contains(name, '" + newValue + "')")
+		console.log(this.props.entityName,`?$select=${this.props.columns}&$filter=contains(${this.props.filterField}, '${newValue}')&$top=${this.props.topCount}`);
+
+		return this._context.webAPI.retrieveMultipleRecords(this.props.entityName,`?$select=${this.props.columns}&$filter=contains(${this.props.filterField}, '${newValue}')&$top=${this.props.topCount}`)
 		.then(function (results) {		
 				return results?.entities;		
 		})
 	}
-
 
 	private renderElement()
 	{
@@ -81,6 +93,14 @@ export class InspectorPickerControl implements ComponentFramework.StandardContro
 		// Add code to update control view
 		this._value = context.parameters.sampleProperty.raw;
 		this.props.value = this._value;
+		
+		this.props.topCount = context.parameters.topCount.raw;
+		this.props.columns = context.parameters.columns.raw;
+		this.props.filterField = context.parameters.filterField.raw;
+		this.props.displayFieldLabel = context.parameters.displayFieldLabel.raw;
+		this.props.displayValueField = context.parameters.displayValueField.raw;
+		this.props.entityName =context.parameters.entityName.raw;
+		
 		this.renderElement();
 	}
 
@@ -103,10 +123,5 @@ export class InspectorPickerControl implements ComponentFramework.StandardContro
 	 */
 	public destroy(): void
 	{
-		// Add code to cleanup control if necessary
-		
 	}
 }
-
-
-//https://github.com/dynamicscode/PCF-ReactSample/blob/master/PCFReactSample/index.ts
