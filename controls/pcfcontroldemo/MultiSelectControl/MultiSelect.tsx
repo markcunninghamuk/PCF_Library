@@ -2,6 +2,8 @@ import * as React from "react";
 import AsyncSelect from 'react-select/async';
 
 export interface IProps {
+	isControlVisible: boolean;
+	isControlDisabled: boolean;
 	displayValueField: any;
 	displayFieldLabel: any;
 	columns: any;
@@ -55,6 +57,8 @@ export class MultiSelectControl extends React.Component<IProps, IState> {
 	{		
 		const selectStyles = { menuPortal: (zindex: any) => ({ ...zindex, zIndex: 9999}) };
 
+		if (this.props.isControlVisible)
+		{
         return (
 			<div>
 			<AsyncSelect
@@ -65,8 +69,13 @@ export class MultiSelectControl extends React.Component<IProps, IState> {
 			getOptionValue={e => e[this.props.displayValueField]}
 			loadOptions={this.loadOptions}
 			defaultOptions
+			isDisabled={this.props.isControlDisabled}
 			onChange={this.onChange}		
 			/></div>
-        );
+		)
+		}
+		else{
+			return (<></>);
+		};
 	}
 }

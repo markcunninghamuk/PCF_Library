@@ -19,7 +19,9 @@ export class MultiSelectPCFControl implements ComponentFramework.StandardControl
 		columns: "",
 		topCount: "",
 		filterField: "",
-		entityName: ""	
+		entityName: "",
+		isControlVisible: true,
+		isControlDisabled: true	
 	};
 	private _context: ComponentFramework.Context<IInputs>;
 
@@ -77,6 +79,9 @@ export class MultiSelectPCFControl implements ComponentFramework.StandardControl
 
 	private renderElement()
 	{
+		this.props.isControlDisabled = this._context.mode.isControlDisabled;
+		this.props.isControlVisible = this._context.mode.isVisible;
+
 		ReactDOM.render(
 			React.createElement(MultiSelectControl, this.props)
 			, this._container
