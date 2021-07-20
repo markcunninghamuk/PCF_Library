@@ -12,7 +12,7 @@
     "@types/node": "^10.12.18",
     "@types/powerapps-component-framework": "^1.2.0",
     "@types/react-select": "^3.0.22",
-    "react-select": "^3.1.0"
+    "react-select": "^3.2.0"
   },
   "devDependencies": {
     "pcf-scripts": "^1",

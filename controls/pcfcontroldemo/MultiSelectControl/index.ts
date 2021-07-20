@@ -2,9 +2,12 @@ import {IInputs, IOutputs} from "./generated/ManifestTypes";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { IProps, MultiSelectControl } from "./MultiSelect";
+import { defaultProps } from "react-select/src/Select";
+import { debug } from "console";
 
 export class MultiSelectPCFControl implements ComponentFramework.StandardControl<IInputs, IOutputs> {
 
+	private _existingValues: any
 	private _value: any;
 	private _notifyOutputChanged:() => void;
 	private _container: HTMLDivElement;
@@ -12,7 +15,8 @@ export class MultiSelectPCFControl implements ComponentFramework.StandardControl
 	{ 
 		value : "", 
 		onChange : this.notifyChange.bind(this),
-		onSearch : this.notifySearch.bind(this),
+		onSearch : this.notifySearch.bind(this),	
+		initialValues : undefined,	
 		records: [],
 		displayValueField: "",
 		displayFieldLabel: "",
@@ -41,7 +45,7 @@ export class MultiSelectPCFControl implements ComponentFramework.StandardControl
 	 * @param state A piece of data that persists in one session for a single user. Can be set at any point in a controls life cycle by calling 'setControlState' in the Mode interface.
 	 * @param container If a control is marked control-type='starndard', it will receive an empty div element within which it can render its content.
 	 */
-	public init(context: ComponentFramework.Context<IInputs>, notifyOutputChanged: () => void, state: ComponentFramework.Dictionary, container:HTMLDivElement)
+	public async init(context: ComponentFramework.Context<IInputs>, notifyOutputChanged: () => void, state: ComponentFramework.Dictionary, container:HTMLDivElement)
 	{
 		// Add control initialization code
 		this._context = context;
@@ -54,9 +58,20 @@ export class MultiSelectPCFControl implements ComponentFramework.StandardControl
 		this.props.columns = context.parameters.columns.raw || "";
 		this.props.displayFieldLabel = context.parameters.displayFieldLabel.raw || "";
 		this.props.displayValueField = context.parameters.displayValueField.raw || "";
-				
+					
+		if(this.props.value.length > 0)
+		{
+			this.props.initialValues = await this.onLoad();
+			console.log(JSON.stringify(this.props.initialValues));
+			this.updateView(context);			
+		}	
+		else
+		{
+			this.props.initialValues =[];
+		}	
+		
 		container.appendChild(this._container);
-		console.log("init");
+		
 	}
 
 	notifyChange(newValue: string) 
@@ -77,16 +92,51 @@ export class MultiSelectPCFControl implements ComponentFramework.StandardControl
 		})
 	}
 
+	//Load previous values
+	public async onLoad()
+	{			
+			var count = 0;
+			var qs = `?$select=${this.props.columns}&$filter=`;		
+
+			this.props.value.split(",").forEach(c=>{			
+				if (count > 0)
+				{
+					qs = qs + ' or ' + this.props.displayValueField + ' eq ' + c
+				}
+				else
+				{
+					qs = qs + this.props.displayValueField + ' eq ' + c
+				}
+				count++;
+			});
+			
+			console.log("querystring is " + qs);
+
+			 return this._context.webAPI.retrieveMultipleRecords(this.props.entityName,qs)
+			 .then(function (results) {		
+				return results?.entities.map(val => ({
+					accountid: val.accountid,
+					name: val.name
+				  }));
+
+			});		
+		
+	}
+
 	private renderElement()
 	{
-		this.props.isControlDisabled = this._context.mode.isControlDisabled;
-		this.props.isControlVisible = this._context.mode.isVisible;
-
-		ReactDOM.render(
-			React.createElement(MultiSelectControl, this.props)
-			, this._container
-		);
-		console.log("viewUpdated");
+		if(this.props.initialValues != undefined)
+		{
+			this.props.isControlDisabled = this._context.mode.isControlDisabled;
+			this.props.isControlVisible = this._context.mode.isVisible;
+	
+				ReactDOM.render(
+					React.createElement(MultiSelectControl, this.props)
+					, this._container
+				);
+				console.log("viewUpdated");
+		}
+		
 	}
 
 	/**
@@ -105,7 +155,7 @@ export class MultiSelectPCFControl implements ComponentFramework.StandardControl
 		this.props.displayFieldLabel = context.parameters.displayFieldLabel.raw;
 		this.props.displayValueField = context.parameters.displayValueField.raw;
 		this.props.entityName =context.parameters.entityName.raw;
-		
+			
 		this.renderElement();
 	}
 

@@ -2,17 +2,18 @@ import * as React from "react";
 import AsyncSelect from 'react-select/async';
 
 export interface IProps {
+	initialValues: any;
 	isControlVisible: boolean;
 	isControlDisabled: boolean;
 	displayValueField: any;
-	displayFieldLabel: any;
+	displayFieldLabel: any;	
 	columns: any;
 	topCount: any;
 	filterField: any;
 	entityName: any;
     value: string;
 	onChange: (value:string) => void;
-	onSearch: (value:string) => void;
+	onSearch: (value:string) => void;	
 	records: any
 }
 
@@ -21,16 +22,15 @@ export interface IState {
 }
 
 export class MultiSelectControl extends React.Component<IProps, IState> {
-			
+		
     constructor(props: Readonly<IProps>) {
-		super(props);
+		super(props);	
 		this.state = { value: props.value};     
-    }
+	}
 
 	componentWillReceiveProps(p: IProps) 
 	{
 		this.setState({value : (p.value)});
-		console.log("react props");
     }
 
 	onChange = (ob: any) =>
@@ -49,7 +49,6 @@ export class MultiSelectControl extends React.Component<IProps, IState> {
 
 	loadOptions = async (inputValue: string) => {
 		const res = this.props.onSearch(inputValue);
-		console.log("returning" + JSON.stringify(res));
 		return res;		
 	}	
 	
@@ -64,13 +63,14 @@ export class MultiSelectControl extends React.Component<IProps, IState> {
 			<AsyncSelect
 			isMulti={true}
 			menuPortalTarget={document.body}
+			defaultOptions
 			styles={selectStyles}
 			getOptionLabel={e => e[this.props.displayFieldLabel]}
-			getOptionValue={e => e[this.props.displayValueField]}
+			getOptionValue={e => e[this.props.displayValueField]}		
 			loadOptions={this.loadOptions}
-			defaultOptions
 			isDisabled={this.props.isControlDisabled}
-			onChange={this.onChange}		
+			onChange={this.onChange}
+			defaultValue={this.props.initialValues}
 			/></div>
 		)
 		}
@@ -79,3 +79,5 @@ export class MultiSelectControl extends React.Component<IProps, IState> {
 		};
 	}
 }
+
+
