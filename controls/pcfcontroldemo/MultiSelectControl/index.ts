@@ -114,13 +114,8 @@ export class MultiSelectPCFControl implements ComponentFramework.StandardControl
 
 			 return this._context.webAPI.retrieveMultipleRecords(this.props.entityName,qs)
 			 .then(function (results) {		
-				return results?.entities.map(val => ({
-					accountid: val.accountid,
-					name: val.name
-				  }));
-
-			});		
-		
+				return results?.entities;
+			});				
 	}
 
 	private renderElement()
