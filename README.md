@@ -10,7 +10,7 @@ Autocomplete search on entity by supplying a few fields. It will generate a comm
 
 You can find the solution in the following location
 
-[https://github.com/markcunninghamuk/PCF_Library/files/5506989/MultiSelectControl.zip](https://github.com/markcunninghamuk/PCF_Library/releases)
+https://github.com/markcunninghamuk/PCF_Library/releases
 
 ## Need Help?
 Watch this video, it has helped a lot of people solve their problems
